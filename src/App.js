@@ -8,44 +8,12 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      filterText: {
-        value: 1
+      filterTextValue: 1,
+      filterDateFromValue: '2010-04-29',
+      filterDateToValue: '2019-04-29'
       }
-    }
 
-    this.inputsAdd = {
-      inputText: {
-        defaultValue: '',
-        placeholder: 'add',
-        type: 'text'
-      },
-      inputDate: {
-        defaultValue: new Date().toLocaleDateString(),
-        type: 'date'
-      },
-      inputSubmit: {
-        value: 'Submit',
-        type: 'submit'
-      }
-    };
-    this.inputsFilter = {
-      inputText: {
-        value: this.state.filterText.vlaue,
-        placeholder: 'add',
-        type: 'text',
-        onChange: (e) => this.handleTextFilterChange(e)
-      },
-      inputDateFrom: {
-        value: '',
-        type: 'date',
-        onChange: this.handleDateFromFilterChange
-      },
-      inputDateTo: {
-        value: '',
-        type: 'date',
-        onChange: this.handleDateToFilterChange
-      }
-    }
+
     this.handleDateFromFilterChange = this.handleDateFromFilterChange.bind(this);
     this.handleDateToFilterChange = this.handleDateToFilterChange.bind(this);
     this.handleTextFilterChange = this.handleTextFilterChange.bind(this);
@@ -62,9 +30,7 @@ class App extends React.Component {
   handleTextFilterChange(e) {
     let value = e.target.value;
     this.setState({
-      filterText: {
-        value: value
-      }
+      filterTextValue: value
     })
     // this.setState({
     //   inputsFilter: {
@@ -75,16 +41,43 @@ class App extends React.Component {
   }
 
   render() {
-    console.log('app rendered');
-    console.log(this.state)
+    console.log(this.state.filterTextValue);
     return (
       <div className="App">
-        <Form className="form-add" inputs={this.inputsAdd} />
+        <Form className="form-add" inputs={{
+            inputText: {
+              defaultValue: '',
+              placeholder: 'add',
+              type: 'text'
+            },
+            inputDate: {
+              defaultValue: new Date().toLocaleDateString(),
+              type: 'date'
+            },
+            inputSubmit: {
+              value: 'Submit',
+              type: 'submit'
+            }
+          }} />
         <List className="list" />
-        <Form className="form-filter" inputs={this.inputsFilter} 
-          text={this.state.filterTextValue}
-          dateFrom={this.state.filterDateFromValue}
-          dateTo={this.state.filterDateToValue}/>
+        <Form className="form-filter" inputs={{
+            inputText: {
+              value: this.state.filterTextValue,
+              placeholder: 'filter',
+              type: 'text',
+              onChange: this.handleTextFilterChange
+            },
+            inputDateFrom: {
+              defaultValue: '2010-01-30',
+              type: 'date',
+              onChange: this.handleDateFromFilterChange
+            },
+            inputDateTo: {
+              value: '2010-01-30',
+              type: 'date',
+              onChange: this.handleDateToFilterChange
+            }}}
+         />
       </div>
     );
   }
