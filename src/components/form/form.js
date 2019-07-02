@@ -13,7 +13,7 @@ export class Form extends React.Component {
         }
 
         return (
-            <form onSubmit={(e) => {e.preventDefault(); console.log('submitted')}}>
+            <form onSubmit={(e) => {e.preventDefault(); console.log('submitted'); this.props.onSubmit(e)}}>
                 {res}
             </form>
         )
