@@ -22,27 +22,52 @@ class App extends React.Component {
       filterDateToValue: '2019-04-29'
       }
 
-    this.handleDateFromFilterChange = this.handleDateFromFilterChange.bind(this);
-    this.handleDateToFilterChange = this.handleDateToFilterChange.bind(this);
+    this.handleDateFilterChange = this.handleDateFilterChange.bind(this);
     this.handleTextFilterChange = this.handleTextFilterChange.bind(this);
+    this.handleFiltersDrop = this.handleFiltersDrop.bind(this);
 
-    this.fullData = this.state.data;
+    this.fullData = this.state.data.slice();
   }
 
   handleListClick(e) {
     console.log(e.target);
   }
 
-  handleDateFromFilterChange(e) {
+  handleDateFilterChange(e) {
+    let dateFrom = document.querySelectorAll('input[type=date]')[1].value;
+    let dateTo = document.querySelectorAll('input[type=date]')[2].value;
+
     this.setState({
-      filterDateFromValue: e.target.value
-    });
+      filterDateFromValue: dateFrom,
+      filterDateToValue: dateTo
+    })
   }
 
-  handleDateToFilterChange(e) {
-    this.setState({
-      filterDateToValue: e.target.value
+  handleFiltersSubmit() {
+    let dateFrom = this.state.filterDateFromValue;
+    let dateTo = this.state.filterDateToValue;
+
+    let data = this.fullData.slice();
+    data = data.filter(item => {
+      return this.compareDates(dateFrom, dateTo, item.date) && 
+        item.text.indexOf(this.state.filterTextValue) !== -1
     });
+
+    this.setState({
+      data: data
+    })
+  }
+
+  handleFiltersDrop() {
+    let data = this.fullData;
+    let mm = this.minAndMax(data);
+    let dateFrom = mm.min.date;
+    let dateTo = mm.max.date;
+    this.setState({
+      data: data,
+      filterDateFromValue: dateFrom,
+      filterDateToValue: dateTo
+    })
   }
 
   handleTextFilterChange(e) {
@@ -79,9 +104,42 @@ class App extends React.Component {
       date: date
     });
 
+    let {min, max} = this.minAndMax(this.fullData);
+    console.log(min.date, max.date)
+
     this.setState({
-      data: this.fullData
+      data: this.fullData,
+      filterDateFromValue: min.date,
+      filterDateToValue: max.date
     })
+  }
+
+  minAndMax(array) {
+    let max = array[0]; 
+    let min = array[0];
+    array.forEach(item => {
+      if (this.compareDates(item.date, min.date)) {
+        min = item;
+      } else if (this.compareDates(max.date, item.date)) {
+        max = item;
+      }
+    })
+    return {min: min, max: max}
+  }
+
+  /**
+   * returns true if targetDate is between dateFrom and dateTo,
+   * if there's no targetDate retruns if dateFrom < dateTo
+   * @param {*} dateFrom 
+   * @param {*} dateTo 
+   * @param {*} targetDate 
+   */
+  compareDates(dateFrom, dateTo, targetDate = null) {
+    if (targetDate) {
+    return (targetDate <= dateTo && targetDate >= dateFrom) ||
+      (targetDate >= dateTo && targetDate <= dateFrom)
+    }
+    return dateFrom <= dateTo
   }
 
   render() {
@@ -116,18 +174,23 @@ class App extends React.Component {
             inputDateFrom: {
               value: this.state.filterDateFromValue,
               type: 'date',
-              onChange: this.handleDateFromFilterChange
+              onChange: this.handleDateFilterChange
             },
             inputDateTo: {
               value: this.state.filterDateToValue,
               type: 'date',
-              onChange: this.handleDateToFilterChange
+              onChange: this.handleDateFilterChange
+            }, 
+            inputSubmitFilters: {
+              value: 'filter',
+              type: 'submit'
             },
             inputDropFilters: {
               value: 'Drop',
-              type: 'submit',
+              type: 'button',
+              onClick: this.handleFiltersDrop
             }
-          }} onSubmit={() => this.handleFiltersDrop()}
+          }} onSubmit={(e) => {e.preventDefault(); this.handleFiltersSubmit(e)}}
          />
       </div>
     );
