@@ -8,7 +8,6 @@ class App extends React.Component {
     super(props);
 
     let today = this._getDateForForm();
-    console.log(today);
     this.state = {
       data: [],
       addTextValue: '',
@@ -269,7 +268,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.state)
     return (
       <div className="App">
         <Form className="form-add" inputs={{
@@ -310,7 +308,7 @@ class App extends React.Component {
               onChange: this.handleDateFilterChange
             }, 
             inputSubmitFilters: {
-              value: 'filter',
+              value: 'Filter',
               type: 'submit'
             },
             inputDropFilters: {
