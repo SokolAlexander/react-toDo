@@ -8,20 +8,10 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      data: [{
-        date: '2019-04-30',
-        text: 'blablabla',
-        checked: true,
-        index: 0
-      },
-      {
-        date: '2019-04-30',
-        text: 'blablabla',
-        index: 1
-      }],
+      data: [],
       addTextValue: '',
       addDateValue: '',
-      filterTextValue: 1,
+      filterTextValue: '',
       filterDateFromValue: '2010-04-29',
       filterDateToValue: '2019-04-29',
       isSortedBy: {
@@ -46,11 +36,37 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    let data = [];
+    for (let key in localStorage) {
+      if (key.indexOf('react-app') === -1) continue;
+      data.push(JSON.parse(localStorage.getItem(key)))
+    };
+
+    let mm = this.minAndMaxDates(data);
+    let dateFrom = mm.min.date;
+    let dateTo = mm.max.date;
+
+    this.setState({
+      data: data,
+      filterDateFromValue: dateFrom,
+      filterDateToValue: dateTo
+    });
+    
+    this.fullData = data.slice();
+  }
+
   checkItem(index) {
     let data = this.state.data.slice();
+    let checkedItem;
     data.forEach((item) => {
-      if (item.index === parseInt(index)) item.checked = !item.checked
-    })
+      if (item.index === parseInt(index)) {
+        item.checked = !item.checked;
+        checkedItem = item;
+      }
+    });
+
+    localStorage.setItem(index + '-react-app', JSON.stringify(checkedItem));
     this.setState({
       data: data
     });
@@ -60,6 +76,7 @@ class App extends React.Component {
     let data = this.state.data.slice();
     data = data.filter((item) => item.index !== parseInt(index));
     this.fullData = this.fullData.filter((item) => item.index !== parseInt(index));
+    localStorage.removeItem(index + '-react-app');
     this.setState({
       data: data
     })
@@ -109,7 +126,7 @@ class App extends React.Component {
 
   handleDateFilterChange(e) {
     let dateFrom = e.target.parentNode.querySelectorAll('input[type=date]')[0].value;
-    let dateTo = document.querySelectorAll('input[type=date]')[0].value;
+    let dateTo = e.target.parentNode.querySelectorAll('input[type=date]')[1].value;
 
     this.setState({
       filterDateFromValue: dateFrom,
@@ -195,7 +212,9 @@ class App extends React.Component {
         text: false,
         date: false
       }
-    })
+    });
+
+    localStorage.setItem(index + '-react-app', JSON.stringify(newItem));
   }
 
   getNextIndex() {
@@ -212,6 +231,7 @@ class App extends React.Component {
   }
 
   minAndMaxDates(array) {
+    if (!array.length) return;
     let max = array[0]; 
     let min = array[0];
     array.forEach(item => {
