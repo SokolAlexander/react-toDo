@@ -1,17 +1,121 @@
-.item-check {
-    width: 20px;
-    height: 20px;
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li { 
+    background: rgba(221, 204, 204, 0.432);
+    color: #644;
+    margin: 10px 0px;
+    display: block;
+    padding: 15px 0px;
+    height: 30px;
+    border-radius: 15px 0px 0px 15px;
+}
+
+li:hover {
+    background: #eef;
+    border-right: 1px solid #644;
+}
+
+.list {
+    width: 75%;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.list-header {
+    border: 1px solid  black;
+    border-width: 1px 0px;
+}
+
+.header-date:hover,
+.header-text:hover {
+    cursor: pointer;   
+    background: rgba(238, 221, 221, 0.555); 
+    box-sizing: border-box;
+}
+
+.header-date,
+.header-text {
+    padding: 15px 0px;
+    font-weight: bolder;
+}
+
+.header-block {
+    height: 40px;
+}
+
+.header-block,
+.item-block {
     float: left;
-    background: blue;
+    text-align: center;
+    height: 100%;
+}
+
+.item-block {
+    box-sizing: border-box;
+}
+
+.header-check {
+    border: 1px solid white;
+}
+
+.header-delete{
+    float: right;
+}
+
+.header-check,
+.item-check {
+    width: 15%;
+}
+
+.header-date,
+.item-date {
+    width: 25%;
+}
+
+.header-text,
+.item-text {
+    width: 45%
+}
+
+.clearfix {
+    width: 10px;
+    height: 100%;
+    clear: both;
+}
+
+.item-check {
+    background: url('../../checkmark.svg') no-repeat 50%;
+    cursor: pointer;
 }
 
 .item-check.checked {
-    background: green;
+    opacity: 1;
 }
 
 .item-delete {
-    width: 20px;
-    height: 20px;
-    background-color: red;
+    background: url('../../cross.svg') no-repeat 50%;
     float: right;
+    width: 10%;
+    cursor: pointer;
+}
+
+.item-delete,
+.item-check {
+    opacity: 0.15;
+}
+
+.item-delete:hover,
+.item-check:hover {
+    opacity: 1;
+}
+
+.header-date:active,
+.header-text:active,
+.item-delete:active,
+.item-check:active {
+    transform: scale(0.95);
 }

@@ -7,10 +7,12 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    let today = this._getDateForForm();
+    console.log(today);
     this.state = {
       data: [],
       addTextValue: '',
-      addDateValue: '',
+      addDateValue: today,
       filterTextValue: '',
       filterDateFromValue: '2010-04-29',
       filterDateToValue: '2019-04-29',
@@ -25,7 +27,7 @@ class App extends React.Component {
     this.handleTextAddChange = this.handleTextAddChange.bind(this);
     this.handleDateAddChange = this.handleDateAddChange.bind(this);
     this.handleFiltersDrop = this.handleFiltersDrop.bind(this);
-    this.getNextIndex = this.getNextIndex.bind(this)
+    this._getNextIndex = this._getNextIndex.bind(this)
 
     this.fullData = this.state.data.slice();
     this.listActions = {
@@ -36,6 +38,18 @@ class App extends React.Component {
     }
   }
 
+  _getDateForForm() {
+    let year = new Date().getFullYear();
+    let month = ((new Date().getMonth()+1) < 10) ?
+       ('0' + (new Date().getMonth()+1)) :
+       (new Date().getMonth() + 1);
+    let day = (new Date().getDate() < 10) ?
+    ('0' + new Date().getDate()) :
+    (new Date().getDate());
+    
+    return `${year}-${month}-${day}`;
+  }
+
   componentDidMount() {
     let data = [];
     for (let key in localStorage) {
@@ -43,7 +57,7 @@ class App extends React.Component {
       data.push(JSON.parse(localStorage.getItem(key)))
     };
 
-    let mm = this.minAndMaxDates(data);
+    let mm = this._minAndMaxDates(data);
     let dateFrom = mm.min.date;
     let dateTo = mm.max.date;
 
@@ -140,7 +154,7 @@ class App extends React.Component {
 
     let data = this.fullData.slice();
     data = data.filter(item => {
-      return this.compareDates(dateFrom, dateTo, item.date) && 
+      return this._compareDates(dateFrom, dateTo, item.date) && 
         item.text.indexOf(this.state.filterTextValue) !== -1
     });
 
@@ -152,7 +166,7 @@ class App extends React.Component {
 
   handleFiltersDrop() {
     let data = this.fullData;
-    let mm = this.minAndMaxDates(data);
+    let mm = this._minAndMaxDates(data);
     let dateFrom = mm.min.date;
     let dateTo = mm.max.date;
     this.setState({
@@ -177,19 +191,14 @@ class App extends React.Component {
     this.setState({
       filterTextValue: value,
       data: data
-    })
-    // this.setState({
-    //   inputsFilter: {
-    //     inputText: value
-    //   }
-    // });
-    //console.log(this.state)//????? State не обновлятеся до конца handleTextFilterChange?
+    });
+    console.log(this.state)//????? State не обновлятеся до конца handleTextFilterChange?
   }
 
   handleFormAddSubmit(e) {
     let text = this.state.addTextValue;
     let date = this.state.addDateValue;
-    let index = this.getNextIndex();
+    let index = this._getNextIndex();
     let newItem = {
       text: text,
       date: date,
@@ -200,7 +209,7 @@ class App extends React.Component {
     data.push(newItem);
     this.fullData.push(newItem);
 
-    let {min, max} = this.minAndMaxDates(this.fullData);
+    let {min, max} = this._minAndMaxDates(this.fullData);
 
     this.setState({
       data: data,
@@ -217,7 +226,7 @@ class App extends React.Component {
     localStorage.setItem(index + '-react-app', JSON.stringify(newItem));
   }
 
-  getNextIndex() {
+  _getNextIndex() {
     let max = {
       index: 0
     };
@@ -230,14 +239,14 @@ class App extends React.Component {
     return max.index + 1
   }
 
-  minAndMaxDates(array) {
+  _minAndMaxDates(array) {
     if (!array.length) return;
     let max = array[0]; 
     let min = array[0];
     array.forEach(item => {
-      if (this.compareDates(item.date, min.date)) {
+      if (this._compareDates(item.date, min.date)) {
         min = item;
-      } else if (this.compareDates(max.date, item.date)) {
+      } else if (this._compareDates(max.date, item.date)) {
         max = item;
       }
     });
@@ -251,7 +260,7 @@ class App extends React.Component {
    * @param {*} dateTo 
    * @param {*} targetDate 
    */
-  compareDates(dateFrom, dateTo, targetDate = null) {
+  _compareDates(dateFrom, dateTo, targetDate = null) {
     if (targetDate) {
     return (targetDate <= dateTo && targetDate >= dateFrom) ||
       (targetDate >= dateTo && targetDate <= dateFrom)
@@ -260,6 +269,7 @@ class App extends React.Component {
   }
 
   render() {
+    console.log(this.state)
     return (
       <div className="App">
         <Form className="form-add" inputs={{

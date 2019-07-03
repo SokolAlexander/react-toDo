@@ -1,0 +1,42 @@
+form {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid rgb(110, 130, 136);
+}
+
+input {
+    border: 1px solid grey;
+    height: 45px;
+    box-sizing: border-box;
+    margin: 5px;
+    padding: 15px;
+    vertical-align: bottom;
+    border-radius: 5px;
+    box-shadow: none;
+}
+
+input:focus {
+    outline: 1px solid grey;
+    /* outline: none; */
+}
+
+input[type=submit],
+input[type=button] {
+    background-color: rgba(107, 160, 190, 0.603);
+    box-shadow: 0ch;
+    border: none;
+    color: rgb(41, 41, 78);
+    font-weight: bolder;
+    cursor: pointer;
+}
+
+input[type=submit]:hover,
+input[type=button]:hover {
+    outline: 2px solid grey;
+    outline-offset: -2px;
+}
+
+input[type=submit]:active,
+input[type=button]:active {
+    transform: scale(0.95);
+}
