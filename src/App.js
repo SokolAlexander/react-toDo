@@ -19,6 +19,8 @@ class App extends React.Component {
         text: 'blablabla',
         index: 1
       }],
+      addTextValue: '',
+      addDateValue: '',
       filterTextValue: 1,
       filterDateFromValue: '2010-04-29',
       filterDateToValue: '2019-04-29',
@@ -30,6 +32,8 @@ class App extends React.Component {
 
     this.handleDateFilterChange = this.handleDateFilterChange.bind(this);
     this.handleTextFilterChange = this.handleTextFilterChange.bind(this);
+    this.handleTextAddChange = this.handleTextAddChange.bind(this);
+    this.handleDateAddChange = this.handleDateAddChange.bind(this);
     this.handleFiltersDrop = this.handleFiltersDrop.bind(this);
     this.getNextIndex = this.getNextIndex.bind(this)
 
@@ -73,9 +77,8 @@ class App extends React.Component {
     let data = this.state.data.slice();
     if (this.state.isSortedBy[field]) {
       data.reverse();
-    } else {data.sort((a, b) => a[field] < b[field] ? -1 : 1);
-  };
-
+      } else {data.sort((a, b) => a[field] < b[field] ? -1 : 1);
+    };
 
     this.setState({
       data: data,
@@ -90,9 +93,23 @@ class App extends React.Component {
     this.listActions[e.target.dataset.action](e.target.parentNode.dataset.index)
   }
 
+  handleDateAddChange(e) {
+    let date = e.target.value;
+    this.setState({
+      addDateValue: date
+    })
+  }
+
+  handleTextAddChange(e) {
+    let text = e.target.value;
+    this.setState({
+      addTextValue: text
+    })
+  }
+
   handleDateFilterChange(e) {
-    let dateFrom = document.querySelectorAll('input[type=date]')[1].value;
-    let dateTo = document.querySelectorAll('input[type=date]')[2].value;
+    let dateFrom = e.target.parentNode.querySelectorAll('input[type=date]')[0].value;
+    let dateTo = document.querySelectorAll('input[type=date]')[0].value;
 
     this.setState({
       filterDateFromValue: dateFrom,
@@ -153,28 +170,31 @@ class App extends React.Component {
   }
 
   handleFormAddSubmit(e) {
-    let text = e.target.querySelector('input[type=text]').value;
-    e.target.querySelector('input[type=text]').value = '';
-    let date = e.target.querySelector('input[type=date]').value;
-    e.target.querySelector('input[type=date]').value = '';
+    let text = this.state.addTextValue;
+    let date = this.state.addDateValue;
     let index = this.getNextIndex();
-
-    this.fullData = this.state.data.slice();
-    this.fullData.push({
+    let newItem = {
       text: text,
       date: date,
       index: index
-    });
+    };
+
+    let data = this.state.data.slice();
+    data.push(newItem);
+    this.fullData.push(newItem);
 
     let {min, max} = this.minAndMaxDates(this.fullData);
-    console.log(min.date, max.date)
 
     this.setState({
-      data: this.fullData,
+      data: data,
+      addDateValue: '',
+      addTextValue: '',
       filterDateFromValue: min.date,
       filterDateToValue: max.date,
-      isSortedByDate: false,
-      isSortedByText: false
+      isSortedBy: {
+        text: false,
+        date: false
+      }
     })
   }
 
@@ -224,15 +244,17 @@ class App extends React.Component {
       <div className="App">
         <Form className="form-add" inputs={{
             inputText: {
-              defaultValue: '',
+              value: this.state.addTextValue,
               placeholder: 'add',
               type: 'text',
-              required: true
+              required: true,
+              onChange: this.handleTextAddChange
             },
             inputDate: {
-              defaultValue: new Date().toLocaleDateString(),
+              value: this.state.addDateValue,
               type: 'date',
-              required: true
+              required: true,
+              onChange: this.handleDateAddChange
             },
             inputSubmit: {
               value: 'Submit',
