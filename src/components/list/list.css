@@ -1,0 +1,17 @@
+.item-check {
+    width: 20px;
+    height: 20px;
+    float: left;
+    background: blue;
+}
+
+.item-check.checked {
+    background: green;
+}
+
+.item-delete {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    float: right;
+}

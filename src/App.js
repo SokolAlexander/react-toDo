@@ -11,26 +11,83 @@ class App extends React.Component {
       data: [{
         date: '2019-04-30',
         text: 'blablabla',
-        checked: true
+        checked: true,
+        index: 0
       },
       {
         date: '2019-04-30',
-        text: 'blablabla'
+        text: 'blablabla',
+        index: 1
       }],
       filterTextValue: 1,
       filterDateFromValue: '2010-04-29',
-      filterDateToValue: '2019-04-29'
+      filterDateToValue: '2019-04-29',
+      isSortedBy: {
+        text: false,
+        date: false
       }
+    }
 
     this.handleDateFilterChange = this.handleDateFilterChange.bind(this);
     this.handleTextFilterChange = this.handleTextFilterChange.bind(this);
     this.handleFiltersDrop = this.handleFiltersDrop.bind(this);
+    this.getNextIndex = this.getNextIndex.bind(this)
 
     this.fullData = this.state.data.slice();
+    this.listActions = {
+      'check': this.checkItem.bind(this),
+      'delete': this.deleteItem.bind(this),
+      'sortByText': this.sortByText.bind(this),
+      'sortByDate': this.sortByDate.bind(this),
+    }
+  }
+
+  checkItem(index) {
+    let data = this.state.data.slice();
+    data.forEach((item) => {
+      if (item.index === parseInt(index)) item.checked = !item.checked
+    })
+    this.setState({
+      data: data
+    });
+  }
+
+  deleteItem(index) {
+    let data = this.state.data.slice();
+    data = data.filter((item) => item.index !== parseInt(index));
+    this.fullData = this.fullData.filter((item) => item.index !== parseInt(index));
+    this.setState({
+      data: data
+    })
+  }
+
+  sortByDate() {
+    this.sortBy('date');
+  }
+
+  sortByText() {
+    this.sortBy('text');
+  }
+
+  sortBy(field) {
+    let data = this.state.data.slice();
+    if (this.state.isSortedBy[field]) {
+      data.reverse();
+    } else {data.sort((a, b) => a[field] < b[field] ? -1 : 1);
+  };
+
+
+    this.setState({
+      data: data,
+      isSortedBy: {
+        [field]: true
+      }
+    });
   }
 
   handleListClick(e) {
-    console.log(e.target);
+    if (e.target.dataset.action === undefined) return
+    this.listActions[e.target.dataset.action](e.target.parentNode.dataset.index)
   }
 
   handleDateFilterChange(e) {
@@ -54,13 +111,14 @@ class App extends React.Component {
     });
 
     this.setState({
-      data: data
+      data: data,
+      filterTextValue: ''
     })
   }
 
   handleFiltersDrop() {
     let data = this.fullData;
-    let mm = this.minAndMax(data);
+    let mm = this.minAndMaxDates(data);
     let dateFrom = mm.min.date;
     let dateTo = mm.max.date;
     this.setState({
@@ -96,25 +154,44 @@ class App extends React.Component {
 
   handleFormAddSubmit(e) {
     let text = e.target.querySelector('input[type=text]').value;
+    e.target.querySelector('input[type=text]').value = '';
     let date = e.target.querySelector('input[type=date]').value;
+    e.target.querySelector('input[type=date]').value = '';
+    let index = this.getNextIndex();
 
     this.fullData = this.state.data.slice();
     this.fullData.push({
       text: text,
-      date: date
+      date: date,
+      index: index
     });
 
-    let {min, max} = this.minAndMax(this.fullData);
+    let {min, max} = this.minAndMaxDates(this.fullData);
     console.log(min.date, max.date)
 
     this.setState({
       data: this.fullData,
       filterDateFromValue: min.date,
-      filterDateToValue: max.date
+      filterDateToValue: max.date,
+      isSortedByDate: false,
+      isSortedByText: false
     })
   }
 
-  minAndMax(array) {
+  getNextIndex() {
+    let max = {
+      index: 0
+    };
+    this.state.data.map((item) => {
+      if (item.index > max.index) {
+        max = item;
+      } 
+    });
+    console.log(max.index + 1)
+    return max.index + 1
+  }
+
+  minAndMaxDates(array) {
     let max = array[0]; 
     let min = array[0];
     array.forEach(item => {
@@ -123,7 +200,7 @@ class App extends React.Component {
       } else if (this.compareDates(max.date, item.date)) {
         max = item;
       }
-    })
+    });
     return {min: min, max: max}
   }
 
@@ -143,7 +220,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.state.filterTextValue);
     return (
       <div className="App">
         <Form className="form-add" inputs={{

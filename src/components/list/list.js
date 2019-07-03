@@ -1,12 +1,14 @@
 import React from 'react';
+import './list.css';
 
 export class List extends React.Component {
     makeItem(i) {
         let item = this.props.data[i];
-        return <li key={i}>
-            <div className={(item.checked ? "checked " : "") + "item-check"}/>
+        return <li key={item.index} data-index={item.index}>
+            <div className={(item.checked ? "checked " : "") + "item-check"}
+                data-action="check"/>
             <div className="item-date">{item.date}</div>
-            <div className="item-delete"/>
+            <div className="item-delete" data-action="delete"/>
             {this.props.data[i].text}</li>
     }
 
@@ -20,8 +22,8 @@ export class List extends React.Component {
         return (
             <div onClick={this.props.onClick}>
                 <header>
-                    <div className="header-date">Date</div>
-                    <div className="header-text">Text</div>
+                    <div className="header-date" data-action="sortByDate">Date</div>
+                    <div className="header-text" data-action="sortByText">Text</div>
                     </header>
                     <ul>
                         {items}
