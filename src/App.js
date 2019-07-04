@@ -1,6 +1,6 @@
 import React from 'react';
-import {Form} from './components/form/form.js';
-import {List} from './components/list/list.js';
+import Form from './components/form/form.js';
+import List from './components/list/list.js';
 import './App.css';
 
 /**
@@ -9,16 +9,14 @@ import './App.css';
 class App extends React.Component {
   /**
    * Create app, bind nessecary functions, set date field
-   * @param {props} props 
+   * @param {props} props properties
    */
   constructor(props) {
     super(props);
 
-    let today = this._getDateForForm();
     this.state = {
       data: [],
       addTextValue: '',
-      addDateValue: today,
       filterTextValue: '',
       filterDateFromValue: '2010-04-29',
       filterDateToValue: '2019-04-29',
@@ -28,7 +26,8 @@ class App extends React.Component {
       }
     }
 
-    this.handleDateFilterChange = this.handleDateFilterChange.bind(this);
+    this.handleDateFromFilterChange = this.handleDateFromFilterChange.bind(this);
+    this.handleDateToFilterChange = this.handleDateToFilterChange.bind(this);
     this.handleTextFilterChange = this.handleTextFilterChange.bind(this);
     this.handleTextAddChange = this.handleTextAddChange.bind(this);
     this.handleDateAddChange = this.handleDateAddChange.bind(this);
@@ -44,8 +43,8 @@ class App extends React.Component {
   }
 
   /**
-   * gets today's date in format yyyy-mm-dd
-   * @returns {string}
+   * gets date in yyyy-mm-dd format
+   * @return {String} date
    */
   _getDateForForm() {
     const year = new Date().getFullYear();
@@ -55,7 +54,7 @@ class App extends React.Component {
     const day = (new Date().getDate() < 10) ?
     ('0' + new Date().getDate()) :
     (new Date().getDate());
-    
+
     return `${year}-${month}-${day}`;
   }
 
@@ -65,12 +64,13 @@ class App extends React.Component {
    * copies data to full data
    */
   componentDidMount() {
-    let data = [];
-    for (let key in localStorage) {
+    const data = [];
+    for (const key in localStorage) {
       if (key.indexOf('react-app') === -1) continue;
       data.push(JSON.parse(localStorage.getItem(key)))
     };
-
+    
+    const today = this._getDateForForm();
     const mm = this._minAndMaxDates(data);
     const dateFrom = mm.min.date;
     const dateTo = mm.max.date;
@@ -78,18 +78,19 @@ class App extends React.Component {
     this.setState({
       data: data,
       filterDateFromValue: dateFrom,
-      filterDateToValue: dateTo
+      filterDateToValue: dateTo,
+      addDateValue: today
     });
-    
+
     this.fullData = data.slice();
   }
 
   /**
    * flags item as checked
-   * @param {number} index 
+   * @param {Number} index of item to check
    */
   checkItem(index) {
-    let data = this.state.data.slice();
+    const data = this.state.data.slice();
     let checkedItem;
     data.forEach((item) => {
       if (item.index === parseInt(index)) {
@@ -106,7 +107,7 @@ class App extends React.Component {
 
   /**
    * deletes item from data
-   * @param {number} index 
+   * @param {Number} index of item to delete
    */
   deleteItem(index) {
     let data = this.state.data.slice();
@@ -134,10 +135,10 @@ class App extends React.Component {
 
   /**
    * sorts data by text or date
-   * @param {string} field 
+   * @param {String} field text or date
    */
   sortBy(field) {
-    let data = this.state.data.slice();
+    const data = this.state.data.slice();
     if (this.state.isSortedBy[field]) {
       data.reverse();
       } else {data.sort((a, b) => a[field] < b[field] ? -1 : 1);
@@ -153,7 +154,7 @@ class App extends React.Component {
 
   /**
    * handles click on List element, calls appropriate function
-   * @param {Event} e 
+   * @param {Event} e event
    */
   handleListClick(e) {
     if (e.target.dataset.action === undefined) return
@@ -176,23 +177,36 @@ class App extends React.Component {
    * @param {Event} e
    */
   handleTextAddChange(e) {
-    let text = e.target.value;
+    const text = e.target.value;
     this.setState({
       addTextValue: text
     })
   }
 
   /**
-   * handles change of date filter (one or another) 
+   * handles change of date filter 
    * @param {Event} e
    */
-  handleDateFilterChange(e) {
-    const dateFrom = e.target.parentNode.querySelectorAll('input[type=date]')[0].value;
-    const dateTo = e.target.parentNode.querySelectorAll('input[type=date]')[1].value;
+  handleDateFromFilterChange(e) {
+    this._changeDateFilter(e.target.value, 'filterDateFromValue')
+  }
 
+   /**
+   * handles change of dateTo filter
+   * @param {Event} e
+   */
+  handleDateToFilterChange(e) {
+    this._changeDateFilter(e.target.value, 'filterDateToValue')
+  }
+
+  /**
+   * Set the field of state to value date
+   * @param {String} date 
+   * @param {String} field 
+   */
+  _changeDateFilter(date, field) {
     this.setState({
-      filterDateFromValue: dateFrom,
-      filterDateToValue: dateTo
+      [field]: date,
     })
   }
 
@@ -205,7 +219,7 @@ class App extends React.Component {
 
     let data = this.fullData.slice();
     data = data.filter(item => {
-      return this._compareDates(dateFrom, dateTo, item.date) && 
+      return this._compareDates(dateFrom, dateTo, item.date) &&
         item.text.indexOf(this.state.filterTextValue) !== -1
     });
 
@@ -219,7 +233,7 @@ class App extends React.Component {
    * drops filters
    */
   handleFiltersDrop() {
-    let data = this.fullData;
+    const data = this.fullData;
     const mm = this._minAndMaxDates(data);
     const dateFrom = mm.min.date;
     const dateTo = mm.max.date;
@@ -237,7 +251,7 @@ class App extends React.Component {
   handleTextFilterChange(e) {
     const value = e.target.value;
     let data;
-    
+
     if (!e.nativeEvent.data) {
       data = this.fullData;
     } else {
@@ -250,7 +264,6 @@ class App extends React.Component {
       filterTextValue: value,
       data: data
     });
-    //console.log(this.state)//????? State не обновлятеся до конца handleTextFilterChange?
   }
 
   /**
@@ -267,15 +280,16 @@ class App extends React.Component {
       index: index
     };
 
-    let data = this.state.data.slice();
+    const data = this.state.data.slice();
     data.push(newItem);
     this.fullData.push(newItem);
 
-    let {min, max} = this._minAndMaxDates(this.fullData);
+    const {min, max} = this._minAndMaxDates(this.fullData);
+    const today = this._getDateForForm();
 
     this.setState({
       data: data,
-      addDateValue: '',
+      addDateValue: today,
       addTextValue: '',
       filterDateFromValue: min.date,
       filterDateToValue: max.date,
@@ -290,7 +304,7 @@ class App extends React.Component {
 
   /**
    * Find max index in data, return max+1
-   * @returns {number}
+   * @return {Number}
    */
   _getNextIndex() {
     let max = {
@@ -300,7 +314,7 @@ class App extends React.Component {
     this.state.data.map((item) => {
       if (item.index > max.index) {
         max = item;
-      } 
+      }
     });
     return max.index + 1
   }
@@ -308,11 +322,11 @@ class App extends React.Component {
   /**
    * find min and max dates in data
    * @param {Array} array 
-   * @returns {object}
+   * @return {Object}
    */
   _minAndMaxDates(array) {
     if (!array.length) return;
-    let max = array[0]; 
+    let max = array[0];
     let min = array[0];
     array.forEach(item => {
       if (this._compareDates(item.date, min.date)) {
@@ -327,9 +341,10 @@ class App extends React.Component {
   /**
    * returns true if targetDate is between dateFrom and dateTo,
    * if there's no targetDate retruns if dateFrom < dateTo
-   * @param {*} dateFrom 
-   * @param {*} dateTo 
-   * @param {*} targetDate 
+   * @param {String} dateFrom
+   * @param {String} dateTo
+   * @param {String} targetDate
+   * @return {Boolean} 
    */
   _compareDates(dateFrom, dateTo, targetDate = null) {
     if (targetDate) {
@@ -341,7 +356,7 @@ class App extends React.Component {
 
   /**
    * render an app
-   * @returns {ReactComponent}
+   * @return {ReactComponent}
    */
   render() {
     return (
@@ -376,13 +391,13 @@ class App extends React.Component {
             inputDateFrom: {
               value: this.state.filterDateFromValue,
               type: 'date',
-              onChange: this.handleDateFilterChange
+              onChange: this.handleDateFromFilterChange
             },
             inputDateTo: {
               value: this.state.filterDateToValue,
               type: 'date',
-              onChange: this.handleDateFilterChange
-            }, 
+              onChange: this.handleDateToFilterChange
+            },
             inputSubmitFilters: {
               value: 'Filter',
               type: 'submit'
