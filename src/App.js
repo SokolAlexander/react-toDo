@@ -17,6 +17,7 @@ class App extends React.Component {
     this.state = {
       data: [],
       addTextValue: '',
+      addDateValue: '',
       filterTextValue: '',
       filterDateFromValue: '2010-04-29',
       filterDateToValue: '2019-04-29',
@@ -325,7 +326,14 @@ class App extends React.Component {
    * @return {Object}
    */
   _minAndMaxDates(array) {
-    if (!array.length) return;
+    if (!array.length) return {
+      min: {
+        date: this._getDateForForm()
+      },
+      max: {
+        date: this._getDateForForm()
+      }
+    };
     let max = array[0];
     let min = array[0];
     array.forEach(item => {
