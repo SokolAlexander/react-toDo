@@ -3,7 +3,14 @@ import {Form} from './components/form/form.js';
 import {List} from './components/list/list.js';
 import './App.css';
 
+/**
+ * Class represents an app for to-do list
+ */
 class App extends React.Component {
+  /**
+   * Create app, bind nessecary functions, set date field
+   * @param {props} props 
+   */
   constructor(props) {
     super(props);
 
@@ -28,7 +35,6 @@ class App extends React.Component {
     this.handleFiltersDrop = this.handleFiltersDrop.bind(this);
     this._getNextIndex = this._getNextIndex.bind(this)
 
-    this.fullData = this.state.data.slice();
     this.listActions = {
       'check': this.checkItem.bind(this),
       'delete': this.deleteItem.bind(this),
@@ -37,18 +43,27 @@ class App extends React.Component {
     }
   }
 
+  /**
+   * gets today's date in format yyyy-mm-dd
+   * @returns {string}
+   */
   _getDateForForm() {
-    let year = new Date().getFullYear();
-    let month = ((new Date().getMonth()+1) < 10) ?
+    const year = new Date().getFullYear();
+    const month = ((new Date().getMonth()+1) < 10) ?
        ('0' + (new Date().getMonth()+1)) :
        (new Date().getMonth() + 1);
-    let day = (new Date().getDate() < 10) ?
+    const day = (new Date().getDate() < 10) ?
     ('0' + new Date().getDate()) :
     (new Date().getDate());
     
     return `${year}-${month}-${day}`;
   }
 
+  /**
+   * gets saved data from localStorage (if there is any),
+   * sets date fields to the boundaries of data
+   * copies data to full data
+   */
   componentDidMount() {
     let data = [];
     for (let key in localStorage) {
@@ -56,9 +71,9 @@ class App extends React.Component {
       data.push(JSON.parse(localStorage.getItem(key)))
     };
 
-    let mm = this._minAndMaxDates(data);
-    let dateFrom = mm.min.date;
-    let dateTo = mm.max.date;
+    const mm = this._minAndMaxDates(data);
+    const dateFrom = mm.min.date;
+    const dateTo = mm.max.date;
 
     this.setState({
       data: data,
@@ -69,6 +84,10 @@ class App extends React.Component {
     this.fullData = data.slice();
   }
 
+  /**
+   * flags item as checked
+   * @param {number} index 
+   */
   checkItem(index) {
     let data = this.state.data.slice();
     let checkedItem;
@@ -85,6 +104,10 @@ class App extends React.Component {
     });
   }
 
+  /**
+   * deletes item from data
+   * @param {number} index 
+   */
   deleteItem(index) {
     let data = this.state.data.slice();
     data = data.filter((item) => item.index !== parseInt(index));
@@ -95,14 +118,24 @@ class App extends React.Component {
     })
   }
 
+  /**
+   * calls sortBy with field text
+   */
   sortByDate() {
     this.sortBy('date');
   }
 
+  /**
+   * calls sortBy with field text
+   */
   sortByText() {
     this.sortBy('text');
   }
 
+  /**
+   * sorts data by text or date
+   * @param {string} field 
+   */
   sortBy(field) {
     let data = this.state.data.slice();
     if (this.state.isSortedBy[field]) {
@@ -118,18 +151,30 @@ class App extends React.Component {
     });
   }
 
+  /**
+   * handles click on List element, calls appropriate function
+   * @param {Event} e 
+   */
   handleListClick(e) {
     if (e.target.dataset.action === undefined) return
     this.listActions[e.target.dataset.action](e.target.parentNode.dataset.index)
   }
 
+  /**
+   * handles change of date input in Add form
+   * @param {Event} e
+   */
   handleDateAddChange(e) {
-    let date = e.target.value;
+    const date = e.target.value;
     this.setState({
       addDateValue: date
     })
   }
 
+  /**
+   * handles change off text field in Add form
+   * @param {Event} e
+   */
   handleTextAddChange(e) {
     let text = e.target.value;
     this.setState({
@@ -137,9 +182,13 @@ class App extends React.Component {
     })
   }
 
+  /**
+   * handles change of date filter (one or another) 
+   * @param {Event} e
+   */
   handleDateFilterChange(e) {
-    let dateFrom = e.target.parentNode.querySelectorAll('input[type=date]')[0].value;
-    let dateTo = e.target.parentNode.querySelectorAll('input[type=date]')[1].value;
+    const dateFrom = e.target.parentNode.querySelectorAll('input[type=date]')[0].value;
+    const dateTo = e.target.parentNode.querySelectorAll('input[type=date]')[1].value;
 
     this.setState({
       filterDateFromValue: dateFrom,
@@ -147,9 +196,12 @@ class App extends React.Component {
     })
   }
 
+  /**
+   * handles submitting of filters
+   */
   handleFiltersSubmit() {
-    let dateFrom = this.state.filterDateFromValue;
-    let dateTo = this.state.filterDateToValue;
+    const dateFrom = this.state.filterDateFromValue;
+    const dateTo = this.state.filterDateToValue;
 
     let data = this.fullData.slice();
     data = data.filter(item => {
@@ -163,11 +215,14 @@ class App extends React.Component {
     })
   }
 
+  /**
+   * drops filters
+   */
   handleFiltersDrop() {
     let data = this.fullData;
-    let mm = this._minAndMaxDates(data);
-    let dateFrom = mm.min.date;
-    let dateTo = mm.max.date;
+    const mm = this._minAndMaxDates(data);
+    const dateFrom = mm.min.date;
+    const dateTo = mm.max.date;
     this.setState({
       data: data,
       filterDateFromValue: dateFrom,
@@ -175,8 +230,12 @@ class App extends React.Component {
     })
   }
 
+  /**
+   * handles change of value of text input in Filter form
+   * @param {Event} e 
+   */
   handleTextFilterChange(e) {
-    let value = e.target.value;
+    const value = e.target.value;
     let data;
     
     if (!e.nativeEvent.data) {
@@ -191,14 +250,18 @@ class App extends React.Component {
       filterTextValue: value,
       data: data
     });
-    console.log(this.state)//????? State не обновлятеся до конца handleTextFilterChange?
+    //console.log(this.state)//????? State не обновлятеся до конца handleTextFilterChange?
   }
 
+  /**
+   * handles adding of item
+   * @param {Event} e 
+   */
   handleFormAddSubmit(e) {
-    let text = this.state.addTextValue;
-    let date = this.state.addDateValue;
-    let index = this._getNextIndex();
-    let newItem = {
+    const text = this.state.addTextValue;
+    const date = this.state.addDateValue;
+    const index = this._getNextIndex();
+    const newItem = {
       text: text,
       date: date,
       index: index
@@ -225,19 +288,28 @@ class App extends React.Component {
     localStorage.setItem(index + '-react-app', JSON.stringify(newItem));
   }
 
+  /**
+   * Find max index in data, return max+1
+   * @returns {number}
+   */
   _getNextIndex() {
     let max = {
       index: 0
     };
+    // eslint-disable-next-line
     this.state.data.map((item) => {
       if (item.index > max.index) {
         max = item;
       } 
     });
-    console.log(max.index + 1)
     return max.index + 1
   }
 
+  /**
+   * find min and max dates in data
+   * @param {Array} array 
+   * @returns {object}
+   */
   _minAndMaxDates(array) {
     if (!array.length) return;
     let max = array[0]; 
@@ -267,6 +339,10 @@ class App extends React.Component {
     return dateFrom <= dateTo
   }
 
+  /**
+   * render an app
+   * @returns {ReactComponent}
+   */
   render() {
     return (
       <div className="App">

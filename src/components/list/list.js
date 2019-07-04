@@ -1,9 +1,17 @@
 import React from 'react';
 import './list.css';
 
+/**
+ * class represents a List of items
+ */
 export class List extends React.Component {
+    /**
+     * create one item
+     * @param {number} i
+     * @returns {ReactComponent} 
+     */
     makeItem(i) {
-        let item = this.props.data[i];
+        const item = this.props.data[i];
         return <li key={item.index} data-index={item.index}>
             <div className={(item.checked ? "checked " : "") + "item-check item-block"}
                 data-action="check"/>
@@ -14,6 +22,10 @@ export class List extends React.Component {
             </li>
     }
 
+    /**
+     * renders a list
+     * @returns {ReactComponent}
+     */
     render() {
         let items = [];
         let i = 0;

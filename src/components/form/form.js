@@ -1,20 +1,26 @@
 import React from 'react';
 import './form.css';
 
+/**
+ * class representing a form
+ */
 export class Form extends React.Component {
+    /**
+     * render form
+     */
     render() {        
-        let inputs = this.props.inputs;
+        const inputs = this.props.inputs;
 
         let res = [];
         for (let key in inputs) {
-            let attributes = inputs[key];
+            const attributes = inputs[key];
             res.push(
                 <input key={key} {...attributes} />
             )
         }
 
         return (
-            <form onSubmit={(e) => {e.preventDefault(); console.log('submitted'); this.props.onSubmit(e)}}>
+            <form onSubmit={(e) => {e.preventDefault(); this.props.onSubmit(e)}}>
                 {res}
             </form>
         )
